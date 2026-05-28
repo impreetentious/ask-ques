@@ -1,0 +1,52 @@
+{
+  "name": "ask-ques",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Ask Ques — a one-page question that only takes yes for an answer.",
+  "license": "MIT",
+  "author": "Sidakpreet Singh",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ItsMonarch04/ask-ques.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ItsMonarch04/ask-ques/issues"
+  },
+  "homepage": "https://github.com/ItsMonarch04/ask-ques",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint --deny-warnings .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check:version": "node scripts/check-version-coherence.mjs",
+    "verify": "npm run check:version && npm run typecheck && npm run lint && npm run format:check && npm test && npm run build"
+  },
+  "dependencies": {
+    "@fontsource-variable/fraunces": "^5.2.9",
+    "@fontsource-variable/instrument-sans": "^5.2.8",
+    "next": "^16.2.4",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.17",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "oxlint": "^1.62.0",
+    "prettier": "^3.8.3",
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.5"
+  },
+  "overrides": {
+    "postcss": "^8.5.14"
+  }
+}

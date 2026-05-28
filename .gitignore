@@ -1,0 +1,21 @@
+logs
+*.log
+npm-debug.log*
+node_modules
+/.next/
+/out/
+/.vercel/
+coverage
+*.local
+# env files
+.env*
+!.env.example
+
+*.tsbuildinfo
+next-env.d.ts
+CLAUDE.md
+AGENTS.md
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
