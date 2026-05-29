@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  // Deliberate scope: correctness/suspicious with React, a11y, TypeScript and
+  // import checks. Avoid `all` — style/pedantic rules are disproportionate noise
+  // for an app this size.
+  "categories": {
+    "correctness": "deny",
+    "suspicious": "deny"
+  },
+  "plugins": ["typescript", "import", "react", "jsx-a11y", "unicorn", "oxc"],
+  "options": {
+    "denyWarnings": true
+  },
+  "rules": {
+    // Next uses the automatic JSX runtime.
+    "react/react-in-jsx-scope": "off",
+    // Font and global CSS imports in the layout are side-effect-only by design.
+    "import/no-unassigned-import": "off",
+    // Helpers read better next to the maths they support.
+    "unicorn/consistent-function-scoping": "off",
+    // Short vector names (x, y, nx, ny) are clearer in the physics kernel.
+    "no-shadow": "off"
+  }
+}
