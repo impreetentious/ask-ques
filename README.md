@@ -82,4 +82,4 @@ Ask Ques is available under the [MIT License](./LICENSE).
 
 ---
 
-**Version:** v0.1.0
+**Version:** v0.1.1
