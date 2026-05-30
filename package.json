@@ -1,7 +1,7 @@
 {
   "name": "ask-ques",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.1.0",
   "type": "module",
   "description": "Ask Ques — a one-page question that only takes yes for an answer.",
   "license": "MIT",
