@@ -1,7 +1,7 @@
 {
   "name": "ask-ques",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "Ask Ques — a one-page question that only takes yes for an answer.",
   "license": "MIT",
@@ -28,7 +28,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:version": "node scripts/check-version-coherence.mjs",
-    "verify": "npm run check:version && npm run typecheck && npm run lint && npm run format:check && npm test && npm run build"
+    "check:headers": "node scripts/check-vercel-headers.mjs",
+    "verify": "npm run check:version && npm run check:headers && npm run typecheck && npm run lint && npm run format:check && npm test && npm run build"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.2.9",
