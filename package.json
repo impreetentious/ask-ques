@@ -1,7 +1,7 @@
 {
   "name": "ask-ques",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "description": "Ask Ques — a one-page question that only takes yes for an answer.",
   "license": "MIT",
@@ -34,12 +34,12 @@
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.2.9",
     "@fontsource-variable/instrument-sans": "^5.2.8",
-    "next": "^16.2.5",
+    "next": "^16.2.6",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
   "devDependencies": {
-    "@types/node": "^22.19.17",
+    "@types/node": "^22.19.18",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "oxlint": "^1.63.0",

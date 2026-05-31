@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Ask Ques">
+  <rect width="100" height="100" rx="23" fill="#0b0a14" />
+  <path
+    d="M50,86 C24,66 10,52 10,36 C10,22 20,12 33,12 C41,12 47,16 50,22 C53,16 59,12 67,12 C80,12 90,22 90,36 C90,52 76,66 50,86 Z"
+    fill="#ff5d7e"
+  />
+</svg>

@@ -92,6 +92,8 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
   const whisperLastRef = useRef(0);
   const whisperCursorRef = useRef(0);
   const whisperIdRef = useRef(0);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const moveFocusRef = useRef(false);
 
   const reduced = useReducedMotion();
   const ladder = useMemo(() => buildLadder(config.refusals), [config.refusals]);
@@ -106,6 +108,9 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
     surrender: true,
   };
   const theme = themeFor(config.theme);
+  // The authored opening line belongs to the untouched page. Once the ladder is
+  // moving, every rung brings its own.
+  const note = rung.index === 0 ? rung.note || config.note : rung.note;
 
   // A shared link is static HTML plus a hash. Reading it after hydration keeps
   // the server render deterministic while still making the link self-contained.
@@ -133,6 +138,8 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
       document.title = config.meta.title;
       const description = document.querySelector('meta[name="description"]');
       description?.setAttribute('content', config.meta.description);
+      // The browser chrome follows the theme the link chose, not the built-in one.
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme.paper);
     };
 
     applyMetadata();
@@ -150,7 +157,7 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
     });
     observer.observe(document.head, { childList: true, characterData: true, subtree: true });
     return () => observer.disconnect();
-  }, [config.meta.description, config.meta.title]);
+  }, [config.meta.description, config.meta.title, theme.paper]);
 
   useEffect(() => {
     const markKeyboard = (event: KeyboardEvent): void => {
@@ -213,10 +220,15 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
     observer.observe(slot);
     observer.observe(button);
     window.addEventListener('resize', onResize);
+    // The button is fixed and its slot is not, so a scroll moves one and not the
+    // other. Only reachable on a viewport short enough to scroll, but there the
+    // tether would otherwise pull towards a slot that has moved on.
+    window.addEventListener('scroll', onResize, { passive: true });
 
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', onResize);
+      window.removeEventListener('scroll', onResize);
     };
   }, [measureHome]);
 
@@ -243,18 +255,29 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
     };
   }, [fitYesButton]);
 
+  /**
+   * What the canvas effect needs to read without being restarted for it. A new
+   * `Field` re-seeds every mote, so depending on per-rung values directly would
+   * make the whole background jump on each press of No.
+   */
+  const latestRef = useRef({ measureHome, heat: rung.heat });
+  useEffect(() => {
+    latestRef.current = { measureHome, heat: rung.heat };
+  }, [measureHome, rung.heat]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const field = new Field(canvas, { glow: theme.glow, petals: theme.petals, reduced });
     fieldRef.current = field;
+    field.setHeat(latestRef.current.heat);
     field.frame(0);
 
     const resize = (): void => {
       field.resize();
       field.frame(0);
-      measureHome();
+      latestRef.current.measureHome();
     };
     const observer = new ResizeObserver(resize);
     observer.observe(canvas);
@@ -266,7 +289,13 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
       field.dispose();
       if (fieldRef.current === field) fieldRef.current = null;
     };
-  }, [measureHome, reduced, theme]);
+  }, [reduced, theme.glow, theme.petals]);
+
+  // Escalation reaches the motes too: they rise faster, larger and brighter as
+  // the ladder heats up. Cheap, and it is the only thing tying the two layers.
+  useEffect(() => {
+    fieldRef.current?.setHeat(rung.heat);
+  }, [rung.heat]);
 
   const addWhisper = useCallback(
     (body: Body, radius: number): void => {
@@ -328,6 +357,17 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
     fieldRef.current?.setPointer(null, null);
   }, []);
 
+  /**
+   * A finger has no hover to leave. Without this the button keeps fleeing from
+   * the spot it was last tapped, and parks itself off-centre for good.
+   */
+  const releasePointer = useCallback(
+    (event: ReactPointerEvent<HTMLElement>): void => {
+      if (event.pointerType !== 'mouse') clearPointer();
+    },
+    [clearPointer],
+  );
+
   const trackPointer = useCallback((event: ReactPointerEvent<HTMLElement>): void => {
     const pointer = { x: event.clientX, y: event.clientY };
     pointerRef.current = pointer;
@@ -336,6 +376,7 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
 
   const finish = useCallback((): void => {
     if (answered) return;
+    moveFocusRef.current = true;
     setAnswered(true);
     setWhispers([]);
     if (config.chime) playChime();
@@ -354,6 +395,7 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
   }, [finish, ladder.length, rung.surrender]);
 
   const replay = useCallback((): void => {
+    moveFocusRef.current = true;
     setAnswered(false);
     setRungIndex(0);
     setNoPresses(0);
@@ -377,9 +419,22 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
     keyboardFocusRef.current = false;
   }, []);
 
+  /**
+   * Answering unmounts the button that was just pressed, which would drop focus
+   * to the top of the document and make a keyboard user walk back down. The new
+   * headline takes it instead — silently for a mouse, with a ring for a key.
+   */
+  useEffect(() => {
+    if (!moveFocusRef.current) return;
+    moveFocusRef.current = false;
+    headingRef.current?.focus();
+  }, [answered]);
+
+  // The headline is announced by taking focus, so the live region carries the
+  // line under it rather than saying the same word twice.
   const liveText = answered
-    ? `${config.finale.headline} ${config.finale.line}`
-    : rung.note || 'The question is waiting for your answer.';
+    ? config.finale.line
+    : note || 'The question is waiting for your answer.';
   const tally =
     noPresses > 0 ? fillTally(config.finale.tally, noPresses) : config.finale.tallyFirst;
 
@@ -389,6 +444,8 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
       style={machineStyle(theme, rung, yesScale)}
       onPointerMove={trackPointer}
       onPointerLeave={clearPointer}
+      onPointerUp={releasePointer}
+      onPointerCancel={releasePointer}
     >
       <canvas ref={canvasRef} className={styles.field} aria-hidden="true" />
       <div className={styles.vignette} aria-hidden="true" />
@@ -405,7 +462,7 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
         {answered ? (
           <div className={styles.finale}>
             <p className={styles.eyebrow}>The answer has been recorded</p>
-            <h1 id="question" className={styles.finaleHeadline}>
+            <h1 ref={headingRef} tabIndex={-1} id="question" className={styles.finaleHeadline}>
               {config.finale.headline}
             </h1>
             <p className={styles.finaleLine}>{config.finale.line}</p>
@@ -418,11 +475,11 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
         ) : (
           <>
             {config.eyebrow ? <p className={styles.eyebrow}>{config.eyebrow}</p> : null}
-            <h1 id="question" className={styles.question}>
+            <h1 ref={headingRef} tabIndex={-1} id="question" className={styles.question}>
               {config.question}
             </h1>
-            <p id="ask-note" className={styles.note} aria-hidden={rung.note === ''}>
-              {rung.note || '\u00a0'}
+            <p id="ask-note" className={styles.note} aria-hidden={note === ''}>
+              {note || '\u00a0'}
             </p>
             <div className={styles.actionRow}>
               <button

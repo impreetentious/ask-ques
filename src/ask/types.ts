@@ -21,15 +21,6 @@ export type EvasionMode =
   /** Stops running. Trembles in place, and gives in when pressed. */
   | 'doomed';
 
-export const EVASION_MODES: readonly EvasionMode[] = [
-  'still',
-  'drift',
-  'magnet',
-  'skittish',
-  'panic',
-  'doomed',
-];
-
 /**
  * One rung as you write it: the label on the No button, and the line that
  * appears under the question once it has been pressed.
