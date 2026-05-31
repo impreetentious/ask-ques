@@ -1,0 +1,80 @@
+/*
+ * Tokens, reset, and nothing else. Component styling lives in CSS modules.
+ *
+ * The values below are the Midnight theme. They are the fallback the prerendered
+ * HTML paints with; on mount the resolved theme is written over them on the root
+ * element, which also gets the page background right during overscroll.
+ */
+
+:root {
+  --paper: #0b0a14;
+  --paper-deep: #05040b;
+  --ink: #f4eef6;
+  --muted: #a094ad;
+  --glow: #ff6b8b;
+  --accent: #ff5d7e;
+  --accent-deep: #c8305a;
+  --on-accent: #2b0512;
+
+  /* 0 → 1 across the ladder. Warmth, glow and pulse tempo all read from this. */
+  --heat: 0;
+  /* Pulse period. Shortens as heat rises; the page gets a faster heartbeat. */
+  --beat: 1.15s;
+  --yes-scale: 1;
+
+  --serif: 'Fraunces Variable', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --sans:
+    'Instrument Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  color-scheme: light dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+html {
+  /* The flying No button is fixed; a scrollbar appearing mid-flight would jump it. */
+  overflow: hidden;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}

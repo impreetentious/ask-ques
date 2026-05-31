@@ -1,9 +1,6 @@
 import { ask } from '@/ask/config';
+import { AskMachine } from '@/ui/ask-machine';
 
 export default function HomePage() {
-  return (
-    <main>
-      <h1>{ask.meta.title}</h1>
-    </main>
-  );
+  return <AskMachine initialConfig={ask} />;
 }

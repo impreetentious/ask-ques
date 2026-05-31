@@ -1,0 +1,371 @@
+.machine {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: 100svh;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 50% 32%,
+      color-mix(in srgb, var(--glow) var(--ambient-glow), transparent) 0,
+      transparent 32rem
+    ),
+    radial-gradient(
+      circle at 15% 85%,
+      color-mix(in srgb, var(--accent) var(--ambient-accent), transparent) 0,
+      transparent 34rem
+    ),
+    linear-gradient(145deg, var(--paper) 0%, var(--paper-deep) 100%);
+}
+
+.field,
+.vignette,
+.grain {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.field {
+  z-index: -3;
+}
+
+.vignette {
+  z-index: -2;
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 28%,
+      color-mix(in srgb, var(--paper-deep) 56%, transparent) 100%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--paper-deep) 18%, transparent),
+      transparent 26%,
+      color-mix(in srgb, var(--paper-deep) 28%, transparent)
+    );
+}
+
+.grain {
+  z-index: -1;
+  opacity: 0.11;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.72'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  mix-blend-mode: soft-light;
+}
+
+.topline {
+  position: absolute;
+  z-index: 2;
+  top: clamp(1.25rem, 3vw, 2.5rem);
+  right: clamp(1.25rem, 4vw, 4.5rem);
+  left: clamp(1.25rem, 4vw, 4.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.brand {
+  opacity: 0.78;
+}
+
+.makeLink {
+  border-bottom: 1px solid color-mix(in srgb, var(--muted) 48%, transparent);
+  text-decoration: none;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.makeLink:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.content {
+  z-index: 1;
+  align-self: center;
+  width: min(100% - 2.5rem, 58rem);
+  margin: clamp(4rem, 12vh, 8rem) auto 3.5rem;
+  text-align: center;
+  animation: heartbeat var(--beat) cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+
+.eyebrow {
+  margin: 0 0 1.25rem;
+  color: var(--muted);
+  font-size: clamp(0.74rem, 1.2vw, 0.9rem);
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.question,
+.finaleHeadline {
+  max-width: 12ch;
+  margin: 0 auto;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: clamp(3.25rem, 10vw, 8.8rem);
+  font-variation-settings:
+    'opsz' 96,
+    'SOFT' 76,
+    'WONK' 1;
+  font-weight: 560;
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.note {
+  min-height: 1.65em;
+  max-width: 31rem;
+  margin: clamp(1.35rem, 3.5vw, 2.15rem) auto 0;
+  color: var(--muted);
+  font-size: clamp(0.98rem, 1.7vw, 1.12rem);
+  text-wrap: balance;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 4vw, 2.25rem);
+  min-height: 8rem;
+  margin-top: clamp(1.45rem, 3.8vw, 2.55rem);
+}
+
+.yesButton,
+.noButton,
+.replayButton {
+  min-height: 3.4rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.88rem 1.75rem;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  font-weight: 730;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.yesButton {
+  position: relative;
+  z-index: 1;
+  min-width: 7.25rem;
+  color: var(--on-accent);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--accent) 88%, white),
+    var(--accent-deep)
+  );
+  box-shadow:
+    0 1.2rem 4rem color-mix(in srgb, var(--accent) var(--yes-shadow), transparent),
+    inset 0 1px 0 color-mix(in srgb, white 45%, transparent);
+  transform: scale(var(--yes-scale));
+  transition:
+    transform 370ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 280ms ease;
+}
+
+.yesButton:hover {
+  box-shadow:
+    0 1.4rem 4.5rem color-mix(in srgb, var(--accent) var(--yes-hover-shadow), transparent),
+    inset 0 1px 0 color-mix(in srgb, white 55%, transparent);
+}
+
+.noSlot {
+  display: inline-block;
+  width: clamp(7.25rem, 21vw, 10.5rem);
+  height: 3.4rem;
+  flex: 0 0 auto;
+  visibility: hidden;
+}
+
+.noButton {
+  position: fixed;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  min-width: 7.25rem;
+  max-width: min(86vw, 21rem);
+  color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 73%, var(--ink));
+  box-shadow: 0 0.7rem 2rem color-mix(in srgb, var(--paper-deep) 62%, transparent);
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+  will-change: transform;
+}
+
+.noButton[data-ready='false'] {
+  visibility: hidden;
+}
+
+.noButton:hover {
+  background: color-mix(in srgb, var(--paper) 64%, var(--ink));
+}
+
+.finale {
+  animation: finale-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.finaleHeadline {
+  font-size: clamp(4.8rem, 15vw, 11rem);
+}
+
+.finaleLine {
+  max-width: 34rem;
+  margin: 1.45rem auto 0;
+  color: var(--muted);
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  text-wrap: balance;
+}
+
+.tally {
+  max-width: 30rem;
+  margin: 2.35rem auto 0;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: clamp(1.16rem, 2.5vw, 1.55rem);
+  font-variation-settings:
+    'opsz' 38,
+    'SOFT' 64;
+  font-style: italic;
+  text-wrap: balance;
+}
+
+.signoff {
+  margin: 1.15rem 0 0;
+  color: var(--muted);
+}
+
+.replayButton {
+  margin-top: 2.35rem;
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--muted) 45%, transparent);
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.replayButton:hover {
+  border-color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 54%, var(--ink));
+}
+
+.whispers {
+  position: fixed;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+
+.whisper {
+  position: absolute;
+  color: color-mix(in srgb, var(--ink) 68%, transparent);
+  font-family: var(--serif);
+  font-size: 0.86rem;
+  font-style: italic;
+  white-space: nowrap;
+  animation: whisper-away 1.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.liveRegion {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.version {
+  position: absolute;
+  right: clamp(1.25rem, 4vw, 4.5rem);
+  bottom: clamp(1rem, 3vw, 2.25rem);
+  margin: 0;
+  color: color-mix(in srgb, var(--muted) 56%, transparent);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  14% {
+    transform: scale(var(--pulse-scale));
+  }
+
+  28% {
+    transform: scale(1);
+  }
+}
+
+@keyframes finale-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.2rem) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes whisper-away {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -25%) scale(0.8);
+  }
+
+  18% {
+    opacity: 0.78;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -4.5rem) rotate(-5deg) scale(1.1);
+  }
+}
+
+@media (max-width: 38rem) {
+  .content {
+    margin-top: 5.5rem;
+  }
+
+  .actionRow {
+    gap: 1rem;
+  }
+
+  .yesButton,
+  .noButton,
+  .replayButton {
+    padding-right: 1.35rem;
+    padding-left: 1.35rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content,
+  .finale,
+  .whisper {
+    animation: none;
+  }
+
+  .yesButton {
+    transition: none;
+  }
+}
