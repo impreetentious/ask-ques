@@ -16,9 +16,12 @@ import type { AskConfig, Refusal } from './types';
 
 const VERSION = 1;
 
-/** A hostile or careless link should not be able to break the layout. */
-const MAX_TEXT = 240;
-const MAX_REFUSALS = 24;
+/**
+ * A hostile or careless link should not be able to break the layout. The builder
+ * imports these so its inputs stop where the codec would otherwise truncate.
+ */
+export const MAX_TEXT = 240;
+export const MAX_REFUSALS = 24;
 const MAX_WHISPERS = 24;
 
 interface Packed {
@@ -42,10 +45,13 @@ interface Packed {
 // oxlint-disable-next-line no-control-regex -- Input sanitization intentionally matches control ranges.
 const CONTROL_CHARS = new RegExp('[\\u0000-\\u001F\\u007F-\\u009F]', 'g');
 
-/** Strips control characters, trims, and caps length. */
+/** Flattens to a single line, trims, and caps length. */
 function clean(value: unknown, max = MAX_TEXT): string {
   if (typeof value !== 'string') return '';
-  return value.replaceAll(CONTROL_CHARS, '').trim().slice(0, max);
+  // Control characters become a space rather than nothing. Every field here is
+  // rendered as one line, and deleting the newline out of a two-line question
+  // would run its last and first words together.
+  return value.replaceAll(CONTROL_CHARS, ' ').replace(/\s+/gu, ' ').slice(0, max).trim();
 }
 
 function toBase64Url(bytes: Uint8Array): string {

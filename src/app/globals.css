@@ -42,10 +42,13 @@ body {
   min-height: 100%;
 }
 
-html {
-  /* The flying No button is fixed; a scrollbar appearing mid-flight would jump it. */
-  overflow: hidden;
-}
+/*
+ * The document is deliberately left scrollable. Nothing on the question page can
+ * grow it mid-flight — the No button, the whispers and the canvas are all fixed —
+ * so no scrollbar appears to jump the button. What scrolling buys: the builder
+ * form on /make, which is several screens long, and any viewport where the
+ * question outgrows the glass, zoomed or simply short.
+ */
 
 body {
   background: var(--paper);

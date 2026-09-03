@@ -11,6 +11,8 @@ Ask Ques is designed so the joke does not depend on excluding people.
 - Answering, and asking again, unmounts the button that was just pressed. Focus moves to the new
   `h1` rather than dropping to the top of the document, so the headline is announced once and the
   next Tab continues from where the page now is.
+- The document scrolls. Both surfaces are composed to fit a viewport, but a zoomed, short, or narrow
+  one can outgrow that, and the content stays reachable when it does.
 - `prefers-reduced-motion: reduce` pins the No button, stops the heartbeat, motes, whispers and
   burst, and retains the copy, scales, buttons and finale.
 - The interface uses the theme’s contrast-conscious ink, muted text, and accent pairings. Any new

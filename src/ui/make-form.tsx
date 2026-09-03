@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { toHash } from '@/ask/codec';
+import { MAX_REFUSALS, MAX_TEXT, toHash } from '@/ask/codec';
 import { ask } from '@/ask/config';
 import { THEMES } from '@/ask/themes';
 import type { AskConfig, Refusal } from '@/ask/types';
@@ -48,7 +48,7 @@ function parseRefusals(value: string): Refusal[] {
     .split(/\r?\n/u)
     .map((line) => line.trim())
     .filter(Boolean)
-    .slice(0, 24)
+    .slice(0, MAX_REFUSALS)
     .map((line) => {
       const separator = line.indexOf('|');
       if (separator === -1) return { no: line };
@@ -83,8 +83,13 @@ function configFromDraft(draft: Draft): AskConfig {
   };
 }
 
+/**
+ * The site root as seen from this page, so a link works at a domain root and at
+ * an exported subpath alike. `.html` is matched too: a plain static host serves
+ * the exported builder at `/make.html` rather than `/make`.
+ */
 function rootUrl(hash: string): string {
-  const root = window.location.pathname.replace(/\/make\/?$/u, '/') || '/';
+  const root = window.location.pathname.replace(/\/make(?:\.html)?\/?$/u, '/') || '/';
   return `${window.location.origin}${root}${hash}`;
 }
 
@@ -149,16 +154,19 @@ export function MakeForm() {
               Small line above it <em>optional</em>
             </span>
             <input
+              aria-label="Small line above it"
               value={draft.eyebrow}
+              maxLength={MAX_TEXT}
               onChange={(event) => update('eyebrow', event.target.value)}
             />
           </label>
           <label className={styles.field}>
             <span>Question</span>
             <textarea
+              aria-label="Question"
               value={draft.question}
               rows={2}
-              maxLength={240}
+              maxLength={MAX_TEXT}
               onChange={(event) => update('question', event.target.value)}
             />
           </label>
@@ -166,11 +174,17 @@ export function MakeForm() {
             <span>
               Opening line under it <em>optional</em>
             </span>
-            <input value={draft.note} onChange={(event) => update('note', event.target.value)} />
+            <input
+              aria-label="Opening line under it"
+              value={draft.note}
+              maxLength={MAX_TEXT}
+              onChange={(event) => update('note', event.target.value)}
+            />
           </label>
           <label className={styles.field}>
             <span>Yes button</span>
             <input
+              aria-label="Yes button"
               value={draft.yes}
               maxLength={80}
               onChange={(event) => update('yes', event.target.value)}
@@ -186,10 +200,14 @@ export function MakeForm() {
           </p>
           <label className={styles.field}>
             <span>
-              Refusals <em>{refusalCount}/24</em>
+              Refusals{' '}
+              <em>
+                {refusalCount}/{MAX_REFUSALS}
+              </em>
             </span>
             <textarea
               className={styles.ladder}
+              aria-label="Refusals"
               value={draft.refusals}
               rows={11}
               onChange={(event) => update('refusals', event.target.value)}
@@ -203,22 +221,28 @@ export function MakeForm() {
           <label className={styles.field}>
             <span>Big answer</span>
             <input
+              aria-label="Big answer"
               value={draft.headline}
+              maxLength={MAX_TEXT}
               onChange={(event) => update('headline', event.target.value)}
             />
           </label>
           <label className={styles.field}>
             <span>Line underneath</span>
             <textarea
+              aria-label="Line underneath"
               value={draft.line}
               rows={2}
+              maxLength={MAX_TEXT}
               onChange={(event) => update('line', event.target.value)}
             />
           </label>
           <label className={styles.field}>
             <span>Sign-off</span>
             <input
+              aria-label="Sign-off"
               value={draft.signoff}
+              maxLength={MAX_TEXT}
               onChange={(event) => update('signoff', event.target.value)}
             />
           </label>
@@ -228,7 +252,11 @@ export function MakeForm() {
           <legend>The feeling</legend>
           <label className={styles.field}>
             <span>Theme</span>
-            <select value={draft.theme} onChange={(event) => update('theme', event.target.value)}>
+            <select
+              aria-label="Theme"
+              value={draft.theme}
+              onChange={(event) => update('theme', event.target.value)}
+            >
               {Object.entries(THEMES).map(([name, theme]) => (
                 <option key={name} value={name}>
                   {theme.label}
@@ -239,6 +267,7 @@ export function MakeForm() {
           <label className={styles.checkbox}>
             <input
               type="checkbox"
+              aria-label="Play a small chime when they say yes"
               checked={draft.chime}
               onChange={(event) => update('chime', event.target.checked)}
             />
@@ -255,6 +284,7 @@ export function MakeForm() {
         <label className={styles.linkField}>
           <span className={styles.srOnly}>Your shareable link</span>
           <input
+            aria-label="Your shareable link"
             ref={inputRef}
             value={shareUrl}
             readOnly

@@ -264,7 +264,8 @@
 
 .footer {
   padding-bottom: 0.6rem;
-  color: color-mix(in srgb, var(--muted) 62%, transparent);
+  /* Full muted, not a fade: the same stamp as the question page, and legible. */
+  color: var(--muted);
   font-size: 0.76rem;
   text-align: center;
 }

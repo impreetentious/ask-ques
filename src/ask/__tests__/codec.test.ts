@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fromHash, toHash, unpack } from '@/ask/codec';
+import { MAX_REFUSALS, fromHash, toHash, unpack } from '@/ask/codec';
 import { ask } from '@/ask/config';
 import type { AskConfig } from '@/ask/types';
 
@@ -44,6 +44,35 @@ describe('question hash codec', () => {
     expect(fromHash('#a=', ask)).toBeNull();
     expect(fromHash('#else=entirely', ask)).toBeNull();
     expect(fromHash('#a=eyJ2IjoyfQ', ask)).toBeNull();
+  });
+
+  it('flattens multi-line input to one line without joining words', () => {
+    const decoded = fromHash(
+      toHash({
+        ...ask,
+        question: 'Two lines,\nnot one word',
+        note: '  spaced\tout  ',
+        finale: { ...ask.finale, line: 'Line one.\r\nLine two.' },
+      }),
+      ask,
+    );
+
+    expect(decoded?.question).toBe('Two lines, not one word');
+    expect(decoded?.note).toBe('spaced out');
+    expect(decoded?.finale.line).toBe('Line one. Line two.');
+  });
+
+  it('caps a link that arrives with more rungs than the ladder allows', () => {
+    const decoded = fromHash(
+      toHash({
+        ...ask,
+        refusals: Array.from({ length: MAX_REFUSALS + 6 }, (_, index) => ({ no: `no ${index}` })),
+      }),
+      ask,
+    );
+
+    expect(decoded?.refusals).toHaveLength(MAX_REFUSALS);
+    expect(decoded?.refusals.at(-1)?.no).toBe(`no ${MAX_REFUSALS - 1}`);
   });
 
   it('uses safe fallbacks for missing optional content', () => {
