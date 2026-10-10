@@ -428,7 +428,7 @@ export function AskMachine({ initialConfig = ask }: { initialConfig?: AskConfig 
     if (!moveFocusRef.current) return;
     moveFocusRef.current = false;
     headingRef.current?.focus();
-  }, [answered]);
+  });
 
   // The headline is announced by taking focus, so the live region carries the
   // line under it rather than saying the same word twice.

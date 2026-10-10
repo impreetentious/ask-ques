@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
   basePath,
   images: { unoptimized: true },
   reactStrictMode: true,
+  // Keep local development from generating ignored AI-agent instruction files.
+  agentRules: false,
 };
 
 export default nextConfig;

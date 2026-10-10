@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { MAX_REFUSALS, MAX_TEXT, toHash } from '@/ask/codec';
 import { ask } from '@/ask/config';
 import { THEMES } from '@/ask/themes';
@@ -93,9 +93,14 @@ function rootUrl(hash: string): string {
   return `${window.location.origin}${root}${hash}`;
 }
 
+// The page URL stays fixed while editing; the server has no browser location.
+const subscribeToLocation = () => () => {};
+const readRootUrl = () => rootUrl('');
+const serverRootUrl = () => '';
+
 export function MakeForm() {
   const [draft, setDraft] = useState<Draft>(() => draftFrom(ask));
-  const [shareUrl, setShareUrl] = useState('');
+  const root = useSyncExternalStore(subscribeToLocation, readRootUrl, serverRootUrl);
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'select'>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -103,12 +108,10 @@ export function MakeForm() {
   const hash = useMemo(() => toHash(config), [config]);
   const refusalCount = useMemo(() => parseRefusals(draft.refusals).length, [draft.refusals]);
 
-  useEffect(() => {
-    setShareUrl(rootUrl(hash));
-    setCopyState('idle');
-  }, [hash]);
+  const shareUrl = root ? `${root}${hash}` : '';
 
   const update = <Key extends keyof Draft>(key: Key, value: Draft[Key]): void => {
+    setCopyState('idle');
     setDraft((current) => ({ ...current, [key]: value }));
   };
 
@@ -125,6 +128,7 @@ export function MakeForm() {
   };
 
   const reset = (): void => {
+    setCopyState('idle');
     setDraft(draftFrom(ask));
   };
 
