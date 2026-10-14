@@ -143,9 +143,9 @@ export function unpack(text: string, fallback: AskConfig): AskConfig | null {
     clean(source[index]) || spare;
 
   return {
-    eyebrow: clean(packed.e),
+    eyebrow: packed.e === undefined ? fallback.eyebrow : clean(packed.e),
     question,
-    note: clean(packed.n),
+    note: packed.n === undefined ? fallback.note : clean(packed.n),
     yes: clean(packed.y) || fallback.yes,
     refusals: refusals.length > 0 ? refusals : fallback.refusals,
     whispers: whispers.length > 0 ? whispers : fallback.whispers,

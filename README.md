@@ -4,11 +4,10 @@ Ask Ques is a one-page question that only accepts yes for an answer. The No butt
 and eventually admits the obvious. It is a fully static Next.js app: no server, database, cookies,
 analytics, or third-party requests.
 
-The deployed default asks “Will you be my valentine?”, but every word is configurable. Edit one
-small TypeScript object for a permanent version, or visit `/make` to produce a shareable link that
-carries a custom question entirely in its URL hash.
+Every word is configurable. Edit one small TypeScript object for a permanent version, or visit `/make`
+to produce a shareable link that carries a custom question entirely in its URL hash.
 
-## What ships
+## What Ships
 
 - A ten-rung escalation ladder: each No press advances the copy, scales both buttons, and changes
   the escape behaviour.
@@ -21,7 +20,7 @@ carries a custom question entirely in its URL hash.
 - Static export, Vercel headers, strict TypeScript, deterministic unit tests, and a single local
   verification command.
 
-## Run it locally
+## Run it Locally
 
 Ask Ques pins Node 22.22.2 in [`.nvmrc`](./.nvmrc).
 
@@ -33,7 +32,7 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000). The builder is at
 [http://localhost:3000/make](http://localhost:3000/make).
 
-## Make it yours
+## Make it Yours
 
 For a deployed default, edit [`src/ask/config.ts`](./src/ask/config.ts). It contains every sentence
 shown by the experience: the eyebrow, question, initial note, button labels, refusal ladder,
@@ -67,7 +66,7 @@ needed.
 hardening headers. The app has no API routes, server actions, storage, or secrets. If hosting under
 a project subpath instead of Vercel’s domain root, build with `BASE_PATH=/your-path`.
 
-## Accessibility and privacy
+## Accessibility and Privacy
 
 The primary controls are real buttons. The No button pauses on keyboard focus, changes are announced
 politely, and reduced motion disables running, whispers, and the finale burst without removing the
@@ -78,8 +77,8 @@ Custom builder content is encoded in the hash fragment, which browsers do not se
 
 ## License
 
-Ask Ques is available under the [MIT License](./LICENSE).
+Available under the [MIT License](./LICENSE).
 
 ---
 
-**Version:** v0.2.4
+**Version:** v0.2.5

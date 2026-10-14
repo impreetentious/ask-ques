@@ -1,3 +1,10 @@
+import {
+  configFromDraft,
+  draftFrom,
+  draftErrors,
+  loadQuestion,
+  parseRefusals,
+} from '@/ui/make-form';
 import { describe, expect, it } from 'vitest';
 import { MAX_REFUSALS, fromHash, toHash, unpack } from '@/ask/codec';
 import { ask } from '@/ask/config';
@@ -91,5 +98,56 @@ describe('question hash codec', () => {
     expect(decoded?.whispers).toEqual(ask.whispers);
     expect(decoded?.yes).toBe(ask.yes);
     expect(decoded?.finale.headline).toBe(ask.finale.headline);
+  });
+});
+
+describe('lossless builder imports', () => {
+  it('preserves escaped rows, unknown themes and hidden metadata until the question changes', () => {
+    const custom = customQuestion();
+    custom.refusals = [{ no: 'no | maybe \\later', note: 'pipe | and \\slash' }];
+    custom.theme = 'unlisted';
+    custom.meta.title = 'An unchanged custom title';
+    const baseline = loadQuestion(`https://example.com/${toHash(custom)}`);
+    const draft = draftFrom(baseline);
+    expect(draftErrors(draft)).toEqual([]);
+    expect(configFromDraft(draft, baseline)).toEqual(baseline);
+    expect(fromHash(toHash(configFromDraft(draft, baseline)), ask)).toEqual(baseline);
+    expect(configFromDraft({ ...draft, question: 'Edited question' }, baseline).meta.title).toBe(
+      'Edited question',
+    );
+  });
+  it('counts every row and reports every malformed row without deleting the draft', () => {
+    const draft = draftFrom(ask);
+    draft.refusals = Array.from({ length: 25 }, (_, i) => `row ${i}`).join('\r\n');
+    expect(parseRefusals(draft.refusals)).toHaveLength(25);
+    expect(draftErrors(draft)).toContain('Refusals: 25/24 rows');
+    draft.refusals = ' | note\nlabel | ';
+    expect(draftErrors(draft)).toContain('Row 1: label required');
+    draft.refusals = ' \n';
+    expect(draftErrors(draft)).toContain('Refusals: at least one labelled row is required');
+  });
+  it('normalizes Unicode and controls before validating complete values', () => {
+    const draft = draftFrom(ask);
+    draft.refusals = ` ${'é'.repeat(240)} | \n`;
+    draft.eyebrow = '';
+    draft.note = '';
+    expect(draftErrors(draft)).toEqual([]);
+    draft.refusals = `${'é'.repeat(241)} | note`;
+    expect(draftErrors(draft)).toContain('Row 1 no: 241/240 characters');
+    draft.question = '';
+    expect(draftErrors(draft)).toContain('question: required');
+  });
+  it('refuses protocols, fragment extras, invalid versions and both paste caps', () => {
+    for (const input of [
+      '',
+      'file:///tmp/#a=abc',
+      '#a=abc&x=1',
+      '#a=abc',
+      '#a=' + 'A'.repeat(65537),
+      ' '.repeat(128 * 1024 + 1),
+    ]) {
+      expect(() => loadQuestion(input)).toThrow();
+    }
+    expect(loadQuestion(`  ${toHash(ask)}  `)).toEqual(fromHash(toHash(ask), ask));
   });
 });
